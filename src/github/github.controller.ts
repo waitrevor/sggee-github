@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { GithubService } from './github.service';
 
 @Controller('github')
@@ -16,11 +16,8 @@ export class GithubController {
   }
 
   @Post('update')
-  updateFileInRepo() {
-    return this.githubService.updateFileInrepo(
-      '<p>Hello World!</p>',
-      'public/main.html',
-    );
+  updateFileInRepo(@Body() data: { path: string; editorData: string }) {
+    return this.githubService.updateFileInrepo(data);
   }
 
   @Post('pulls')

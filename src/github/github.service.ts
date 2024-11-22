@@ -196,13 +196,13 @@ export class GithubService {
     return 'Branch Updated Successfully';
   }
 
-  async updateFileInrepo(data: string, path: string) {
+  async updateFileInrepo(data: { path: string; editorData: string }) {
     try {
       // Step 1: Get the SHA of the latest commit of the branch
       const prevCommitSha = await this.getLatestCommitSha();
       // console.log("Latest Commit Sha", prevCommitSha)
 
-      const file = beautify.html(data);
+      const file = beautify.html(data.editorData);
 
       // Step 2: Create the new blob with updated content
       // const blobSha = await this.createBlob(file);
@@ -217,7 +217,11 @@ export class GithubService {
       //   blobSha,
       //   this.filePath,
       // );
-      const newTreeSha = await this.createTree(prevCommitSha, blobSha, path);
+      const newTreeSha = await this.createTree(
+        prevCommitSha,
+        blobSha,
+        data.path,
+      );
       // console.log("Tree Sha", newTreeSha)
 
       // Step 4: Create a new commit with the updated tree
