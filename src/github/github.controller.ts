@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { GithubService } from './github.service';
 
 @Controller('github')
@@ -21,7 +21,8 @@ export class GithubController {
   }
 
   @Post('pulls')
-  createPullRequest() {
-    return this.githubService.createPullRequest();
+  // Change to be body instead of Query
+  createPullRequest(@Query('branch') branch: string) {
+    return this.githubService.createPullRequest(branch);
   }
 }

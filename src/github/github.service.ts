@@ -46,7 +46,6 @@ export class GithubService {
   }
 
   async getBranches() {
-    console.log(this.owner, this.repo, this.token);
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/branches`;
     try {
       let branches: any = await fetch(url, {
@@ -205,18 +204,11 @@ export class GithubService {
       const file = beautify.html(data.editorData);
 
       // Step 2: Create the new blob with updated content
-      // const blobSha = await this.createBlob(file);
-
       const blobSha = await this.createBlob(file);
 
       // console.log("Blob Sha", blobSha)
 
       // Step 3: Create a new tree object that references the new blob
-      // const newTreeSha = await this.createTree(
-      //   prevCommitSha,
-      //   blobSha,
-      //   this.filePath,
-      // );
       const newTreeSha = await this.createTree(
         prevCommitSha,
         blobSha,
@@ -242,10 +234,10 @@ export class GithubService {
     }
   }
 
-  async createPullRequest() {
+  async createPullRequest(branch: string) {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/pulls`;
 
-    console.log(this.newBranchName);
+    console.log(branch);
     try {
       const response: Response = await fetch(url, {
         method: 'POST',
@@ -256,7 +248,7 @@ export class GithubService {
         },
         body: JSON.stringify({
           title: 'Amazing new feature',
-          head: this.newBranchName,
+          head: branch,
           base: this.baseBranch,
           body: 'Please pull these awesome changes in!',
         }),
