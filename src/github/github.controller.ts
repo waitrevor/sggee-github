@@ -1,14 +1,15 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { GithubService } from './github.service';
 
 @Controller('github')
 export class GithubController {
   constructor(private readonly githubService: GithubService) {}
+
   // Figure out getFile and content
-  // @Get()
-  // getFile() {
-  //   return [];
-  // }
+  @Get('file')
+  getFile(@Query('branch') branch: string, @Query('path') path: string) {
+    return this.githubService.getFile(branch, path);
+  }
 
   @Get('branches')
   getBranches() {
@@ -16,13 +17,19 @@ export class GithubController {
   }
 
   @Post('update')
-  updateFileInRepo(@Body() data: { path: string; editorData: string }) {
+  updateFileInRepo(
+    @Body()
+    data: {
+      branch: string;
+      path: string;
+      editorData: string;
+    },
+  ) {
     return this.githubService.updateFileInrepo(data);
   }
 
   @Post('pulls')
-  // Change to be body instead of Query
-  createPullRequest(@Query('branch') branch: string) {
-    return this.githubService.createPullRequest(branch);
+  createPullRequest(@Body() data: { branch: string; message: string }) {
+    return this.githubService.createPullRequest(data);
   }
 }

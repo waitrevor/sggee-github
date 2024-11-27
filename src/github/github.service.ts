@@ -8,21 +8,12 @@ export class GithubService {
   readonly repo: string = process.env.GITHUB_REPO;
   readonly token: string = process.env.GITHUB_API_KEY;
   readonly baseBranch: string = 'main';
-  newBranchName: string = 'new-branch';
-  readonly commitMessage: string = 'updated main.html';
-  filePath: string;
   editorData: string;
 
-  getContent() {
-    return this.editorData;
-  }
-
-  async getFile() {
+  async getFile(branch: string, path: string) {
     const url: string = `https://api.github.com/repos/${this.owner}/${
       this.repo
-    }/contents/${this.filePath}?ref=${
-      this.newBranchName
-    }&timestamp=${new Date().getTime()}`;
+    }/contents/${path}?ref=${branch}&timestamp=${new Date().getTime()}`;
 
     try {
       const response = await fetch(url, {
@@ -39,7 +30,8 @@ export class GithubService {
 
       const data = await response.json();
 
-      this.editorData = window.atob(data.content);
+      this.editorData = atob(data.content);
+      return this.editorData;
     } catch (err) {
       console.log(err);
     }
@@ -51,8 +43,8 @@ export class GithubService {
       let branches: any = await fetch(url, {
         method: 'GET',
         headers: {
-          Authorization: `token ${this.token}`, // Include the token for private repos
-          Accept: 'application/vnd.github.v3+json', // GitHub API version
+          Authorization: `token ${this.token}`,
+          Accept: 'application/vnd.github.v3+json',
         },
       });
       if (!branches.ok) {
@@ -65,10 +57,10 @@ export class GithubService {
     }
   }
 
-  async getLatestCommitSha(): Promise<string> {
+  async getLatestCommitSha(branch: string): Promise<string> {
     const url: string = `https://api.github.com/repos/${this.owner}/${
       this.repo
-    }/commits/${this.newBranchName}?timestamp=${new Date().getTime()}`;
+    }/commits/${branch}?timestamp=${new Date().getTime()}`;
 
     const response: Response = await fetch(url, {
       method: 'GET',
@@ -173,8 +165,8 @@ export class GithubService {
     return data.sha; // Return the SHA of the new commit
   }
 
-  async updateBranchRef(newCommitSha: string): Promise<string> {
-    const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/refs/heads/${this.newBranchName}`;
+  async updateBranchRef(newCommitSha: string, branch: string): Promise<string> {
+    const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/refs/heads/${branch}`;
 
     const response: Response = await fetch(url, {
       method: 'PATCH',
@@ -191,53 +183,52 @@ export class GithubService {
       throw new Error(`Failed to update branch ref: ${response.status}`);
     }
 
-    // console.log('Branch updated successfully');
     return 'Branch Updated Successfully';
   }
 
-  async updateFileInrepo(data: { path: string; editorData: string }) {
+  async updateFileInrepo(data: {
+    branch: string;
+    path: string;
+    editorData: string;
+  }) {
     try {
       // Step 1: Get the SHA of the latest commit of the branch
-      const prevCommitSha = await this.getLatestCommitSha();
-      // console.log("Latest Commit Sha", prevCommitSha)
+      const prevCommitSha = await this.getLatestCommitSha(data.branch);
 
+      // Step 2: Fix the formatting of the editorData
       const file = beautify.html(data.editorData);
 
-      // Step 2: Create the new blob with updated content
+      // Step 3: Create the new blob with updated content
       const blobSha = await this.createBlob(file);
 
-      // console.log("Blob Sha", blobSha)
-
-      // Step 3: Create a new tree object that references the new blob
+      // Step 4: Create a new tree object that references the new blob
       const newTreeSha = await this.createTree(
         prevCommitSha,
         blobSha,
         data.path,
       );
-      // console.log("Tree Sha", newTreeSha)
 
-      // Step 4: Create a new commit with the updated tree
+      // Step 5: Create a new commit with the updated tree
+      let message = `Updating ${data.path}`;
       const newCommitSha = await this.createCommit(
         prevCommitSha,
         newTreeSha,
-        this.commitMessage,
+        message,
       );
-      // console.log("New Commit Sha", newCommitSha)
 
-      // Step 5: Update the branch to point to the new commit
-      await this.updateBranchRef(newCommitSha);
+      // Step 6: Update the branch to point to the new commit
+      await this.updateBranchRef(newCommitSha, data.branch);
 
-      // console.log('File updated successfully');
       return 'File updated Successfully';
     } catch (error) {
       console.error('Error updating file:', error);
     }
   }
 
-  async createPullRequest(branch: string) {
+  async createPullRequest(data: { branch: string; message: string }) {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/pulls`;
 
-    console.log(branch);
+    console.log(data.branch);
     try {
       const response: Response = await fetch(url, {
         method: 'POST',
@@ -247,18 +238,16 @@ export class GithubService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: 'Amazing new feature',
-          head: branch,
+          title: `${data.branch} pull request`,
+          head: data.branch,
           base: this.baseBranch,
-          body: 'Please pull these awesome changes in!',
+          body: data.message,
         }),
       });
       if (!response.ok) {
         throw new Error(`Failed to create PR: ${response.status}`);
       }
 
-      const data = await response.json();
-      // console.log('Pull Request Created:', data);
       return 'Pull Request Created';
     } catch (err) {
       console.error('Error creating PR:', err);
