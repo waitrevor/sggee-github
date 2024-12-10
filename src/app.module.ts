@@ -1,12 +1,18 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { GithubModule } from './modules/github.module';
 import { ConfigModule } from '@nestjs/config';
+import {JwtService} from "./services/JwtService.js";
+import {APP_GUARD} from "@nestjs/core";
+import {JwtAuthGuard} from "./auth/JwtAuthGuard.js";
 
 @Module({
   imports: [GithubModule, ConfigModule.forRoot()],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [
+    JwtService,
+    {
+        provide: APP_GUARD,
+        useClass: JwtAuthGuard
+    }],
 })
 export class AppModule {}

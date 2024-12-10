@@ -20,10 +20,14 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@codegenie/serverless-express": "^4.16.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "aws-lambda": "^1.0.7",
+    "cookie-parser": "^1.4.7",
+    "jose": "^5.9.6",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "simply-beautiful": "^1.0.1"
