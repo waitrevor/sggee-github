@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { GithubService } from '../services/github.service';
+import { Body, Controller, Get, Post, Query, HttpCode } from '@nestjs/common';
+import { GithubService } from '../services/GithubService.js';
+import { Roles } from '../auth/RolesDecorator.js';
+import {UserGroupEnum} from "../models/UserCredentialTypes.js";
 
 @Controller('github')
 export class GithubController {
@@ -12,6 +14,8 @@ export class GithubController {
   }
 
   @Get('branches')
+  @HttpCode(202)
+  @Roles([UserGroupEnum.ADMIN, UserGroupEnum.MAINTENANCE])
   getBranches() {
     return this.githubService.getBranches();
   }

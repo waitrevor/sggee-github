@@ -1,5 +1,5 @@
 import {NestFactory} from "@nestjs/core";
-import {AppModule} from "./app.module";
+import {AppModule} from "./AppModule.js";
 import cookieParser from "cookie-parser";
 import {Callback, Context, Handler} from 'aws-lambda';
 import {CorsOptions} from "@nestjs/common/interfaces/external/cors-options.interface.js";
@@ -27,7 +27,7 @@ async function bootstrap() {
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
-bootstrap()
+
 
 async function lambdaBootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -49,3 +49,4 @@ export const handler: Handler = async (
 // if (!process.env.IS_LAMBDA) {
 //     await bootstrap();
 // }
+bootstrap()

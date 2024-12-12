@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class GithubService {
-  readonly owner: string = process.env.GITHUB_OWNER;
-  readonly repo: string = process.env.GITHUB_REPO;
-  readonly token: string = process.env.GITHUB_API_KEY;
+  readonly owner: string = process.env.GITHUB_OWNER!;
+  readonly repo: string = process.env.GITHUB_REPO!;
+  readonly token: string = process.env.GITHUB_API_KEY!;
   readonly baseBranch: string = 'main';
   editorData: string;
 
@@ -26,9 +26,8 @@ export class GithubService {
         throw new Error(`Failed to fetch file: ${response.status}`);
       }
 
-      const data = await response.json();
-
-      this.editorData = atob(data.content);
+      const data = await response.json().toString();
+      this.editorData = atob(data);
       return this.editorData;
     } catch (err) {
       console.log(err);
@@ -37,6 +36,7 @@ export class GithubService {
 
   async getBranches() {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/branches`;
+    console.log(this.token)
     try {
       let branches: any = await fetch(url, {
         method: 'GET',
@@ -48,9 +48,10 @@ export class GithubService {
       if (!branches.ok) {
         throw new Error(`Failed to fetch branches: ${branches.status}`);
       }
-
+      console.log('This is something')
       return branches.json();
     } catch (error) {
+      console.log('This is the error')
       console.error('Error:', error);
     }
   }
@@ -72,8 +73,8 @@ export class GithubService {
       throw new Error(`Failed to get latest commit SHA: ${response.status}`);
     }
 
-    const data = await response.json();
-    return data.sha; // Return the commit SHA
+    const data = await response.json().toString();
+    return data; // Return the commit SHA
   }
   async createBlob(content: string): Promise<string> {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/blobs`;
@@ -95,8 +96,8 @@ export class GithubService {
       throw new Error(`Failed to create blob: ${response.status}`);
     }
 
-    const data: { sha: string } = await response.json();
-    return data.sha; // Return the SHA of the new blob
+    const data = await response.json().toString();
+    return data; // Return the SHA of the new blob
   }
 
   async createTree(
@@ -130,8 +131,8 @@ export class GithubService {
       throw new Error(`Failed to create tree: ${response.status}`);
     }
 
-    const data: { sha: string } = await response.json();
-    return data.sha; // Return the SHA of the new tree
+    const data = await response.json().toString();
+    return data; // Return the SHA of the new tree
   }
 
   async createCommit(
@@ -159,8 +160,8 @@ export class GithubService {
       throw new Error(`Failed to create commit: ${response.status}`);
     }
 
-    const data: { sha: string } = await response.json();
-    return data.sha; // Return the SHA of the new commit
+    const data = await response.json().toString();
+    return data; // Return the SHA of the new commit
   }
 
   async updateBranchRef(newCommitSha: string, branch: string): Promise<string> {

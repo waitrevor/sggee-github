@@ -1,21 +1,30 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+    "target": "es2020",
+    "lib": [
+      "es2020"
+    ],
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
+    "emitDecoratorMetadata": true,
+    "module": "es2022",
+    "rootDir": "src",
+    "moduleResolution": "node10",
     "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "paths": {},
+    "types": [
+      "node",
+      "Multer"
+    ],
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": true,
+    "skipLibCheck": true
   }
 }
