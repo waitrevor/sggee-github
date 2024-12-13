@@ -26,8 +26,8 @@ export class GithubService {
         throw new Error(`Failed to fetch file: ${response.status}`);
       }
 
-      const data = await response.json().toString();
-      this.editorData = atob(data);
+      const data: any = await response.json();
+      this.editorData = atob(data.content);
       return this.editorData;
     } catch (err) {
       console.log(err);
@@ -36,7 +36,6 @@ export class GithubService {
 
   async getBranches() {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/branches`;
-    console.log(this.token)
     try {
       let branches: any = await fetch(url, {
         method: 'GET',
@@ -48,10 +47,8 @@ export class GithubService {
       if (!branches.ok) {
         throw new Error(`Failed to fetch branches: ${branches.status}`);
       }
-      console.log('This is something')
       return branches.json();
     } catch (error) {
-      console.log('This is the error')
       console.error('Error:', error);
     }
   }
@@ -73,8 +70,8 @@ export class GithubService {
       throw new Error(`Failed to get latest commit SHA: ${response.status}`);
     }
 
-    const data = await response.json().toString();
-    return data; // Return the commit SHA
+    const data: any = await response.json()
+    return data.sha; // Return the commit SHA
   }
   async createBlob(content: string): Promise<string> {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/blobs`;
@@ -96,8 +93,8 @@ export class GithubService {
       throw new Error(`Failed to create blob: ${response.status}`);
     }
 
-    const data = await response.json().toString();
-    return data; // Return the SHA of the new blob
+    const data: any = await response.json();
+    return data.sha; // Return the SHA of the new blob
   }
 
   async createTree(
@@ -131,8 +128,8 @@ export class GithubService {
       throw new Error(`Failed to create tree: ${response.status}`);
     }
 
-    const data = await response.json().toString();
-    return data; // Return the SHA of the new tree
+    const data: any = await response.json();
+    return data.sha; // Return the SHA of the new tree
   }
 
   async createCommit(
@@ -160,8 +157,8 @@ export class GithubService {
       throw new Error(`Failed to create commit: ${response.status}`);
     }
 
-    const data = await response.json().toString();
-    return data; // Return the SHA of the new commit
+    const data: any = await response.json();
+    return data.sha; // Return the SHA of the new commit
   }
 
   async updateBranchRef(newCommitSha: string, branch: string): Promise<string> {
