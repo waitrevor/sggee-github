@@ -53,6 +53,27 @@ export class GithubService {
     }
   }
 
+  async createBranch(data: { baseBranch: string; newBranch: string }): Promise<string> {
+    const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/refs`;
+    const latestSha = await this.getLatestCommitSha(data.baseBranch)
+    const response: Response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `token ${this.token}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+      body: JSON.stringify({
+        ref: `refs/heads/${data.newBranch}`,
+        sha: latestSha,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create branch: ${response.status}`);
+    }
+    return `Successfully created ${data.newBranch}` // Return the commit SHA
+  }
+
   async getLatestCommitSha(branch: string): Promise<string> {
     const url: string = `https://api.github.com/repos/${this.owner}/${
       this.repo
@@ -73,6 +94,7 @@ export class GithubService {
     const data: any = await response.json()
     return data.sha; // Return the commit SHA
   }
+
   async createBlob(content: string): Promise<string> {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/blobs`;
 

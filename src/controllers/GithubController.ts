@@ -7,7 +7,6 @@ import {UserGroupEnum} from "../models/UserCredentialTypes.js";
 export class GithubController {
   constructor(private readonly githubService: GithubService) {}
 
-  // Figure out getFile and content
   @Get('file')
   @Roles([UserGroupEnum.ADMIN, UserGroupEnum.MAINTENANCE])
   getFile(@Query('branch') branch: string, @Query('path') path: string) {
@@ -18,6 +17,12 @@ export class GithubController {
   @Roles([UserGroupEnum.ADMIN, UserGroupEnum.MAINTENANCE])
   getBranches() {
     return this.githubService.getBranches();
+  }
+
+  @Post('create')
+  @Roles([UserGroupEnum.ADMIN, UserGroupEnum.MAINTENANCE])
+  createBranch(@Body() data: { baseBranch: string; newBranch: string }) {
+    return this.githubService.createBranch(data);
   }
 
   @Post('update')
