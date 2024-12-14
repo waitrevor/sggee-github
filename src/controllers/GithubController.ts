@@ -43,4 +43,8 @@ export class GithubController {
   createPullRequest(@Body() data: { branch: string; message: string }) {
     return this.githubService.createPullRequest(data);
   }
+
+  //Also Create a upload file piece where people can upload jpegs or pdf and possibly new fragments
+  //make it in such a way that it has folders and is familliar for people and easy to use so old people can upload stuff easily
+  //Also look into fixing the front end piece
 }
