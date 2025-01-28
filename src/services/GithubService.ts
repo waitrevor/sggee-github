@@ -13,6 +13,7 @@ export class GithubService {
       this.repo
     }/contents/${path}?ref=${branch}&timestamp=${new Date().getTime()}`;
 
+    // console.log(url)
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -33,6 +34,7 @@ export class GithubService {
       console.log(err);
     }
   }
+
 
   async getBranches() {
     const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/branches`;
@@ -78,7 +80,6 @@ export class GithubService {
     const url: string = `https://api.github.com/repos/${this.owner}/${
       this.repo
     }/commits/${branch}?timestamp=${new Date().getTime()}`;
-
     const response: Response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -267,4 +268,38 @@ export class GithubService {
       console.error('Error creating PR:', err);
     }
   }
+
+
+
+  async uploadFile( branch: string, name: string, content: Buffer) {
+
+    const encodedContent = content.toString('base64');
+    const data = {branch: branch, path: name, editorData: encodedContent}
+
+    await this.updateFileInrepo(data)
+
+    return `Successfullty uploaded ${name}`
+  }
+
+  async getContent(branch: string) {
+
+    const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/trees/${branch}?recursive=1`;
+
+    try {
+      let response: any = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `token ${this.token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch contents: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
 }

@@ -29,6 +29,7 @@
     "aws-lambda": "^1.0.7",
     "cookie-parser": "^1.4.7",
     "jose": "^5.9.6",
+    "pdfjs": "^2.5.3",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "simply-beautiful": "^1.0.1"

@@ -14,7 +14,7 @@
     "paths": {},
     "types": [
       "node",
-      "Multer"
+      "multer"
     ],
     "resolveJsonModule": true,
     "allowJs": true,
