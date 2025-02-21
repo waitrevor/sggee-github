@@ -20,12 +20,6 @@ export class GithubController {
     return this.githubService.getBranches();
   }
 
-  @Get('/v1/content')
-  @Roles([UserGroupEnum.ADMIN, UserGroupEnum.MAINTENANCE])
-  getContent(@Query('branch') branch: string) {
-    return this.githubService.getContent(branch);
-  }
-
   @Post('/v1/create_branch')
   @Roles([UserGroupEnum.ADMIN, UserGroupEnum.MAINTENANCE])
   createBranch(@Body() data: { baseBranch: string; newBranch: string }) {

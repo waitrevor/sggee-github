@@ -13,7 +13,6 @@ export class GithubService {
       this.repo
     }/contents/${path}?ref=${branch}&timestamp=${new Date().getTime()}`;
 
-    // console.log(url)
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -281,9 +280,8 @@ export class GithubService {
     return `Successfullty uploaded ${name}`
   }
 
-  async getContent(branch: string) {
-
-    const url: string = `https://api.github.com/repos/${this.owner}/${this.repo}/git/trees/${branch}?recursive=1`;
+  async getContent(path: string, branch: string) {
+    const url: string = `https://api.github.com/repos/waitrevor/racecar/contents/${path}?ref=${branch}`
 
     try {
       let response: any = await fetch(url, {
@@ -301,5 +299,33 @@ export class GithubService {
       console.error('Error:', error);
     }
   }
+
+  async deleteContent(path: string, branch: string) {
+    const res = await this.getContent(path, branch)
+    const sha = res.sha
+    const url: string = `https://api.github.com/repos/waitrevor/racecar/contents/${path}?ref=${branch}`
+
+    try {
+      let response: any = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `token ${this.token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify({
+          message: `${path} Deleted`,
+          sha: sha,
+          branch: branch,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to Delete contents: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
 
 }
