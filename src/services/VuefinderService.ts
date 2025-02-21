@@ -68,14 +68,14 @@ export class VuefinderService {
     }
 
     async upload(file: any, req: any, res: any) {
-      console.log('This is inside upload', req.query)
+      // console.log('This is inside upload', req.query)
       let name: string
       if (req.query.path == '') {
         name = file.originalname
       } else {
         name = req.query.path + '/' + file.originalname
       }
-      console.log(req.query.branch, name)
+      // console.log(req.query.branch, name)
         await this.githubService.uploadFile(req.query.branch, name, file.buffer)
         return await this.index(req, res)
     }
